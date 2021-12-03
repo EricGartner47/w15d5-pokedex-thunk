@@ -37,6 +37,31 @@ export const getPokemonTypes = () => async dispatch => {
   }
 };
 
+export const getPokemonDetails = (id) => async dispatch => {
+  const response = await fetch(`/api/pokemon/${id}`);
+
+  if (response.ok) {
+    const details = await response.json();
+    dispatch(addOnePokemon(details));
+    return details;
+  }
+}
+
+export const createPokemon = (newPokemon) => async dispatch => {
+  const response = await fetch(`/api/pokemon`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(newPokemon)
+  });
+  const pokemon = await response.json();
+  if (response.ok) {
+    dispatch(addOnePokemon(pokemon));
+    return pokemon;
+  }
+
+
+}
+
 const initialState = {
   list: [],
   types: []
@@ -50,7 +75,7 @@ const sortList = (list) => {
 
 const pokemonReducer = (state = initialState, action) => {
   switch (action.type) {
-    case LOAD: 
+    case LOAD:
       const allPokemon = {};
       action.list.forEach(pokemon => {
         allPokemon[pokemon.id] = pokemon;
@@ -60,12 +85,12 @@ const pokemonReducer = (state = initialState, action) => {
         ...state,
         list: sortList(action.list)
       };
-    case LOAD_TYPES: 
+    case LOAD_TYPES:
       return {
         ...state,
         types: action.types
       };
-    case ADD_ONE: 
+    case ADD_ONE:
       if (!state[action.pokemon.id]) {
         const newState = {
           ...state,
@@ -83,7 +108,7 @@ const pokemonReducer = (state = initialState, action) => {
           ...action.pokemon
         }
       };
-    case LOAD_ITEMS: 
+    case LOAD_ITEMS:
       return {
         ...state,
         [action.pokemonId]: {
